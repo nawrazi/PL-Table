@@ -47,8 +47,6 @@ for num in range(len(name_list)):
           ' '*(16 - len(name_list[num])), final_table['mp'][num], # matches played
           ' '*((2 - (len(mp_list[num]))) + 1), final_table['pts'][num], # points
           ' '*((2 - (len(points_list[num]))) + 2), final_table['gd'][num], # goal difference
-          end='\n'*2 )
-
-print('\nSource: goal.com')
+          end='\n'*2)
 
 input()
