@@ -11,20 +11,27 @@ from tkinter.messagebox import showerror
 def watermark():
     global waterRoot, screenHeight, screenWidth
     waterRoot = Tk()
+
     screenWidth = waterRoot.winfo_screenwidth()
     screenHeight = waterRoot.winfo_screenheight()
-    pictureWidth = int(screenWidth / 2) - int(487 / 2)
-    pictureHeight = int(screenHeight / 2) - int(487 / 2) - int(0.05787*screenHeight)
-    canvas = Canvas(waterRoot, width = 487, height = 487, bg = 'white', highlightthickness = 0)
+
+    pillowImage = Image.open("C:\Storage\Code\Python\PL Table\PC App\Window App\Table 2.0\img\watermark.png")
+    imageWidth, imageHeight = pillowImage.size
+
+    xPosition = (screenWidth // 2) - (imageWidth // 2)
+    yPosition = (screenHeight // 2) - (imageHeight // 2) - int(0.05787*screenHeight)
+
+    canvas = Canvas(waterRoot, width = 487, height = 487, bg = "white", highlightthickness = 0)
     canvas.pack()
     canvas.master.overrideredirect(True)
-    canvas.master.geometry('+%d+%d' %(pictureWidth,pictureHeight))
+    canvas.master.geometry('+%d+%d' %(xPosition,yPosition))
     canvas.master.wm_attributes("-transparentcolor", "white")
-    canvas.master.wm_attributes("-alpha", 0.4)
+    canvas.master.wm_attributes("-alpha", 0.6)
     canvas.master.wm_attributes("-topmost", True)
     canvas.master.lift()
-    img = ImageTk.PhotoImage(Image.open("C:\Storage\Code\Python\PL Table\PC App\Window App\Table 2.0\img\watermark.png"))
-    canvas.create_image(10, 10, anchor = NW, image = img)
+
+    photoImage = ImageTk.PhotoImage(pillowImage)
+    canvas.create_image(10, 10, anchor = NW, image = photoImage)
 
     waterRoot.mainloop()
 
