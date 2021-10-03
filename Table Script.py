@@ -15,7 +15,7 @@ def watermark():
     screenWidth = waterRoot.winfo_screenwidth()
     screenHeight = waterRoot.winfo_screenheight()
 
-    pillowImage = Image.open("C:\Storage\Code\Python\PL Table\PC App\Window App\Table 3.0\img\watermark.png")
+    pillowImage = Image.open("img/watermark.png")
     imageWidth, imageHeight = pillowImage.size
 
     xPosition = (screenWidth // 2) - (imageWidth // 2)
@@ -90,7 +90,7 @@ def table():
 
     tableRoot = Tk()
     tableRoot.title('Table')
-    tableRoot.iconbitmap(r'C:\Storage\Code\Python\PL Table\PC App\Window App\Table 3.0\img\logo.ico')
+    tableRoot.iconbitmap(r'img/logo.ico')
     tableRoot.resizable(False, False)
     tableRoot.geometry('430x740')
     yPosition = (screenHeight-740)/4
