@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Label, Canvas, NW
 from bs4 import BeautifulSoup
 from requests import get
 from PIL import ImageTk, Image
@@ -32,22 +32,19 @@ def watermark():
 def scrape():
     URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
     try:
-        web_html = get(URL).text
+        website = get(URL).text
     except Exception:
         networkError()
 
-    soup = BeautifulSoup(web_html, 'lxml')
+    soup = BeautifulSoup(website, 'lxml')
 
-    name_list = []
-    points_list = []
-    gd_list = []
-    mp_list = []
-    pos_list = []
+    pos_list, name_list, mp_list, points_list, gd_list = (list() for _ in range(5))
 
     teams = soup.find_all('tr', class_ = ('p0c-competition-tables__row p0c-competition-tables__row--rank-status p0c-competition-tables__row--rank-status-1',
                                           'p0c-competition-tables__row p0c-competition-tables__row--rank-status p0c-competition-tables__row--rank-status-2',
                                           'p0c-competition-tables__row p0c-competition-tables__row--rank-status p0c-competition-tables__row--rank-status-',
                                           'p0c-competition-tables__row p0c-competition-tables__row--rank-status p0c-competition-tables__row--rank-status-relegation'))
+
     for team in teams:
         position = (team.find('td')).text.strip()
         pos_list.append(position)
@@ -55,66 +52,34 @@ def scrape():
         name = (team.find('td', class_='p0c-competition-tables__team')).text.strip()
         name_list.append(name)
 
+        matches_played = (team.find('td', class_='p0c-competition-tables__matches-played')).text.strip()
+        mp_list.append(matches_played)
+
         points = (team.find('td', class_='p0c-competition-tables__pts')).text.strip()
         points_list.append(points)
 
         goal_diff = (team.find('td', class_='p0c-competition-tables__goals-diff')).text.strip()
         gd_list.append(goal_diff)
 
-        matches_played = (team.find('td', class_='p0c-competition-tables__matches-played')).text.strip()
-        mp_list.append(matches_played)
-
-    final_table = {
-    'positions': pos_list,
-    'names': name_list,
-    'pts': points_list,
-    'gd': gd_list,
-    'mp': mp_list
-    }
-
-    return final_table
+    return zip(pos_list, name_list, mp_list, points_list, gd_list)
 
 
 def table():
     final_table = scrape()
+    newLine = '\n'
+    windowText = dict()
 
-    final_string_title = ''
-    final_string_mp = ''
-    final_string_names = ''
-    final_string_pts = ''
-    final_string_gd = ''
-    windowText = {}
+    windowText['header'] = f"{' '*7}TEAM{' '*36}MP{' '*12}PTS{' '*11}GD{newLine*2}"
 
-    final_string_title += ' '*7
-    final_string_title += 'TEAM'
-    final_string_title += ' '*36
-    final_string_title += 'MP'
-    final_string_title += ' '*11
-    final_string_title += 'PTS'
-    final_string_title += ' '*11
-    final_string_title += 'GD'
-    final_string_title += '\n'*2
-    windowText['title']=final_string_title
+    windowText['pos'], windowText['names'], windowText['mp'], windowText['pts'], windowText['gd'] = (str() for _ in range(5))
 
-    for num in range(len(final_table['names'])):
-        final_string_names += ' '*(3 - (len(final_table['positions'][num])))
-        final_string_names += final_table['positions'][num]
-        final_string_names += '.'
-        final_string_names += ' '*2
-        final_string_names += final_table['names'][num]
-        final_string_names += ' '*(19 - len(final_table['names'][num]))
-        final_string_names += '\n'*2
-        windowText['names']=final_string_names
+    for pos, name, mp, pts, gd in final_table:
+        windowText['pos'] += f"{' '*(3 - len(pos))}{pos}.{newLine*2}"
+        windowText['names'] += f"{name}{newLine*2}"
+        windowText['mp'] += f"{mp}{newLine*2}"
+        windowText['pts'] += f"{pts}{newLine*2}"
+        windowText['gd'] += f"{gd}{newLine*2}"
 
-        final_string_mp += final_table['mp'][num]
-        final_string_mp += '\n'*2
-        windowText['mp']=final_string_mp
-        final_string_pts += final_table['pts'][num]
-        final_string_pts += '\n'*2
-        windowText['pts']=final_string_pts
-        final_string_gd += final_table['gd'][num]
-        final_string_gd += '\n'*2
-        windowText['gd']=final_string_gd
 
     tableRoot = Tk()
     tableRoot.title('Table')
@@ -125,11 +90,14 @@ def table():
     xPosition = (screenWidth-430)/16
     tableRoot.geometry('+200+%d' %yPosition)
 
-    title = Label(tableRoot, text=windowText['title'], justify='left', font=('Arial Bold',11))
-    title.place(x=5, y=15)
+    header = Label(tableRoot, text=windowText['header'], justify='left', font=('Arial Bold',11))
+    header.place(x=5, y=15)
+
+    names = Label(tableRoot, text=windowText['pos'], justify='left', font=('Arial',11))
+    names.place(x=5, y=50)
 
     names = Label(tableRoot, text=windowText['names'], justify='left', font=('Arial',11))
-    names.place(x=5, y=50)
+    names.place(x=35, y=50)
 
     mp = Label(tableRoot, text=windowText['mp'], justify='left', font=('Arial',11))
     mp.place(x=225, y=50)
