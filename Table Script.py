@@ -1,11 +1,10 @@
-from tkinter import Tk, Label, Canvas, NW
+from tkinter import Tk, Label, Canvas, NW, messagebox
 from bs4 import BeautifulSoup
-from requests import get
+from requests import get, exceptions
 from PIL import ImageTk, Image
 from threading import Thread
 from sys import exit
 from time import sleep
-from tkinter.messagebox import showerror
 
 
 def watermark():
@@ -24,7 +23,7 @@ def watermark():
     canvas = Canvas(waterRoot, width = 487, height = 487, bg = "white", highlightthickness = 0)
     canvas.pack()
     canvas.master.overrideredirect(True)
-    canvas.master.geometry('+%d+%d' %(xPosition,yPosition))
+    canvas.master.geometry(f'+{xPosition}+{yPosition}')
     canvas.master.wm_attributes("-transparentcolor", "white")
     canvas.master.wm_attributes("-alpha", 0.6)
     canvas.master.wm_attributes("-topmost", True)
@@ -39,11 +38,11 @@ def watermark():
 def scrape():
     URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
     try:
-        website = get(URL).text
-    except Exception:
+        webpage = get(URL).text
+    except exceptions.RequestException:
         networkError()
 
-    soup = BeautifulSoup(website, 'lxml')
+    soup = BeautifulSoup(webpage, 'lxml')
 
     pos_list, name_list, mp_list, points_list, gd_list = (list() for _ in range(5))
 
@@ -126,7 +125,7 @@ def destroyWatermark():
 
 def networkError():
     sleep(1)
-    showerror("Error", "Check Your Network")
+    messagebox.showerror("Error", f"Failed to Establish a Connection. Check Your Network!{' '*20}")
     destroyWatermark()
     exit()
 
