@@ -125,7 +125,7 @@ def destroyWatermark():
 
 def networkError():
     sleep(1)
-    messagebox.showerror("Error", f"Check Your Network!{' '*30}")
+    messagebox.showerror("Error", f"Failed To Establish Connection. Check Your Network.{' '*10}")
     destroyWatermark()
     exit()
 
