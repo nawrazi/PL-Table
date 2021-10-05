@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Canvas, NW, messagebox
+from tkinter import Tk, Label, Canvas, NW, messagebox, Button, PhotoImage
 from bs4 import BeautifulSoup
 from requests import get, exceptions
 from PIL import ImageTk, Image
@@ -76,7 +76,7 @@ def table():
     newLine = '\n'
     windowText = dict()
 
-    windowText['header'] = f"{' '*7}TEAM{' '*36}MP{' '*12}PTS{' '*11}GD{newLine*2}"
+    windowText['header'] = f"{' '*7}TEAM{' '*37}MP{' '*13}PTS{' '*11}GD{newLine*2}"
 
     windowText['pos'], windowText['names'], windowText['mp'], windowText['pts'], windowText['gd'] = (str() for _ in range(5))
 
@@ -93,27 +93,27 @@ def table():
     tableRoot.iconbitmap(r'img/logo.ico')
     tableRoot.resizable(False, False)
     tableRoot.geometry('430x740')
-    yPosition = (screenHeight-740)/4
-    xPosition = (screenWidth-430)/16
-    tableRoot.geometry('+200+%d' %yPosition)
+    xPosition = (screenWidth-430)//4
+    yPosition = (screenHeight-740)//4
+    tableRoot.geometry(f'+{xPosition}+{yPosition}')
 
-    header = Label(tableRoot, text=windowText['header'], justify='left', font=('Arial Bold',11))
+    header = Label(tableRoot, text=windowText['header'], justify='left', font=('Century Gothic Bold',11))
     header.place(x=5, y=15)
 
-    pos = Label(tableRoot, text=windowText['pos'], justify='left', font=('Arial',11))
+    pos = Label(tableRoot, text=windowText['pos'], justify='left', font=('Century Gothic',10))
     pos.place(x=5, y=50)
 
-    names = Label(tableRoot, text=windowText['names'], justify='left', font=('Arial',11))
+    names = Label(tableRoot, text=windowText['names'], justify='left', font=('Century Gothic',10))
     names.place(x=35, y=50)
 
-    mp = Label(tableRoot, text=windowText['mp'], justify='left', font=('Arial',11))
+    mp = Label(tableRoot, text=windowText['mp'], justify='left', font=('Century Gothic',10))
     mp.place(x=225, y=50)
 
-    pts = Label(tableRoot, text=windowText['pts'], justify='left', font=('Arial',11))
+    pts = Label(tableRoot, text=windowText['pts'], justify='left', font=('Century Gothic',10))
     pts.place(x=295, y=50)
 
-    gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Arial',11))
-    gd.place(x=363, y=50)
+    gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Century Gothic',10))
+    gd.place(x=360, y=50)
 
 
     def darkMode():
@@ -133,15 +133,45 @@ def table():
     tableRoot.mainloop()
 
 
-def destroyWatermark():
-    waterRoot.after(0, waterRoot.destroy)
-
-
 def networkError():
     sleep(1)
-    messagebox.showerror("Error", f"Failed To Establish Connection. Check Your Network.{' '*10}")
     destroyWatermark()
+
+    errorRoot = Tk()
+    errorRoot.overrideredirect(True)
+    errorRoot.geometry('400x130')
+
+    screenWidth = errorRoot.winfo_screenwidth()
+    screenHeight = errorRoot.winfo_screenheight()
+    xPosition = (screenWidth - 400)//2
+    yPosition = (screenHeight - 200)//2
+    errorRoot.geometry(f'+{xPosition}+{yPosition}')
+
+    errorString = "Failed To Establish Connection. Check Your Network."
+    errorMessage = Label(errorRoot, text=errorString, justify='center', font=('Century Gothic',11))
+    errorMessage.place(x=8, y=30)
+
+    exit_button = Button(errorRoot, text="EXIT", command=errorRoot.destroy, font=('Century Gothic',9))
+    exit_button.place(x=185, y = 90)
+    # img = PhotoImage(file="img/exit_black.png")
+    # exitButton = Button(errorRoot, image=img, borderwidth=0, command=errorRoot.destroy)
+    # exitButton.place(x=173, y=70)
+
+    if isDark():
+        errorRoot.configure(bg='#121212')
+        errorMessage.configure(fg='#ffffff', bg='#121212')
+
+        exit_button.configure(fg='#ffffff', bg='#121212')
+        # imgW = PhotoImage(file="img/exit_white.png")
+        # exitButton.configure(image=imgW, bg='#121212')
+
+    errorRoot.mainloop()
+
     exit()
+
+
+def destroyWatermark():
+    waterRoot.after(0, waterRoot.destroy)
 
 
 
