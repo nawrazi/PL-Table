@@ -5,6 +5,7 @@ from PIL import ImageTk, Image
 from threading import Thread
 from sys import exit
 from time import sleep
+from darkdetect import isDark
 
 
 def watermark():
@@ -99,8 +100,8 @@ def table():
     header = Label(tableRoot, text=windowText['header'], justify='left', font=('Arial Bold',11))
     header.place(x=5, y=15)
 
-    names = Label(tableRoot, text=windowText['pos'], justify='left', font=('Arial',11))
-    names.place(x=5, y=50)
+    pos = Label(tableRoot, text=windowText['pos'], justify='left', font=('Arial',11))
+    pos.place(x=5, y=50)
 
     names = Label(tableRoot, text=windowText['names'], justify='left', font=('Arial',11))
     names.place(x=35, y=50)
@@ -113,6 +114,19 @@ def table():
 
     gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Arial',11))
     gd.place(x=363, y=50)
+
+
+    def darkMode():
+        tableRoot.configure(bg='#121212')
+        header.configure(fg='#FFFFFF', bg='#121212')
+        pos.configure(fg='#FFFFFF', bg='#121212')
+        names.configure(fg='#FFFFFF', bg='#121212')
+        mp.configure(fg='#FFFFFF', bg='#121212')
+        pts.configure(fg='#FFFFFF', bg='#121212')
+        gd.configure(fg='#FFFFFF', bg='#121212')
+
+    if isDark():
+        darkMode()
 
     destroyWatermark()
 
@@ -128,6 +142,7 @@ def networkError():
     messagebox.showerror("Error", f"Failed To Establish Connection. Check Your Network.{' '*10}")
     destroyWatermark()
     exit()
+
 
 
 if __name__ == '__main__':
