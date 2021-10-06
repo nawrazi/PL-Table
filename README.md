@@ -1,3 +1,3 @@
 # PL-Table
 
-Web scraping desktop app to view the live Premier League table, updated directly from goal.com.
+Windows app to display the live Premier League table, updated from goal.com.
