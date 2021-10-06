@@ -40,7 +40,7 @@ def scrape():
     URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
     try:
         webpage = get(URL).text
-    except exceptions.RequestException:
+    except exceptions.RequestException as e:
         networkError()
 
     soup = BeautifulSoup(webpage, 'lxml')
@@ -68,11 +68,10 @@ def scrape():
         goal_diff = (team.find('td', class_='p0c-competition-tables__goals-diff')).text.strip()
         gd_list.append(goal_diff)
 
-    return zip(pos_list, name_list, mp_list, points_list, gd_list)
+    table(zip(pos_list, name_list, mp_list, points_list, gd_list))
 
 
-def table():
-    final_table = scrape()
+def table(final_table):
     newLine = '\n'
     windowText = dict()
 
@@ -110,7 +109,7 @@ def table():
     mp.place(x=225, y=50)
 
     pts = Label(tableRoot, text=windowText['pts'], justify='left', font=('Century Gothic',10))
-    pts.place(x=295, y=50)
+    pts.place(x=296, y=50)
 
     gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Century Gothic',10))
     gd.place(x=360, y=50)
@@ -177,6 +176,6 @@ def destroyWatermark():
 
 if __name__ == '__main__':
     waterMark = Thread(target = watermark)
-    table = Thread(target = table)
+    scrape = Thread(target = scrape)
     waterMark.start()
-    table.start()
+    scrape.start()
