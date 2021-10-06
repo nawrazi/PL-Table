@@ -144,6 +144,10 @@ def table(final_table, online=True):
     gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Century Gothic',10))
     gd.place(x=360, y=50)
 
+    status = Canvas(tableRoot, width=400, height=400, border=0, highlightthickness=0)
+    status.place(x=410, y=720)
+    status.create_oval(5, 5, 8, 8, fill='green' if online else 'red', width=0)
+
     def darkMode():
         tableRoot.configure(bg='#121212')
         header.configure(fg='#FFFFFF', bg='#121212')
@@ -152,6 +156,7 @@ def table(final_table, online=True):
         mp.configure(fg='#FFFFFF', bg='#121212')
         pts.configure(fg='#FFFFFF', bg='#121212')
         gd.configure(fg='#FFFFFF', bg='#121212')
+        status.configure(bg='#121212')
 
     if isDark():
         darkMode()
