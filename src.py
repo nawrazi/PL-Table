@@ -129,6 +129,7 @@ def table(final_table, online=True):
     tableRoot.iconbitmap(r'img/logo.ico')
     tableRoot.resizable(False, False)
     tableRoot.geometry('430x740')
+    tableRoot.attributes('-topmost',True)
     xPosition = (screenWidth-430)//4
     yPosition = (screenHeight-740)//4
     tableRoot.geometry(f'+{xPosition}+{yPosition}')
