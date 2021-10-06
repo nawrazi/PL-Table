@@ -7,6 +7,7 @@ from sys import exit
 from time import sleep
 from darkdetect import isDark
 from json import dumps, loads
+from os import mkdir
 
 
 def watermark():
@@ -83,10 +84,16 @@ def scrapeOnline():
             'names': name_list,
             'mp': mp_list,
             'pts': points_list,
-            'gd': gd_list,
+            'gd': gd_list
         }
 
         data = dumps(final_table)
+
+        try:
+            mkdir('cache')
+        except FileExistsError:
+            pass
+
         with open("cache/cache.json","w") as f:
             f.write(data)
 
