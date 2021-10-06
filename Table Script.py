@@ -50,7 +50,7 @@ def scrape():
 def scrapeOnline():
     URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
 
-    webpage = get(URL, timeout=.6).text
+    webpage = get(URL, timeout=6).text
 
     soup = BeautifulSoup(webpage, 'lxml')
 
