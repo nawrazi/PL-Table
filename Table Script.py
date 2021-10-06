@@ -6,6 +6,7 @@ from threading import Thread
 from sys import exit
 from time import sleep
 from darkdetect import isDark
+from json import dumps, loads
 
 
 def watermark():
@@ -37,11 +38,19 @@ def watermark():
 
 
 def scrape():
-    URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
     try:
-        webpage = get(URL).text
-    except exceptions.RequestException as e:
-        networkError()
+        scrapeOnline()
+    except exceptions.RequestException as noConnection:
+        try:
+            scrapeOffline()
+        except FileNotFoundError as noCache:
+            failure()
+
+
+def scrapeOnline():
+    URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
+
+    webpage = get(URL, timeout=.6).text
 
     soup = BeautifulSoup(webpage, 'lxml')
 
@@ -68,10 +77,31 @@ def scrape():
         goal_diff = (team.find('td', class_='p0c-competition-tables__goals-diff')).text.strip()
         gd_list.append(goal_diff)
 
+    def saveCache():
+        final_table = {
+            'positions': pos_list,
+            'names': name_list,
+            'mp': mp_list,
+            'pts': points_list,
+            'gd': gd_list,
+        }
+
+        data = dumps(final_table)
+        with open("cache/cache.json","w") as f:
+            f.write(data)
+
+    saveCache()
     table(zip(pos_list, name_list, mp_list, points_list, gd_list))
 
 
-def table(final_table):
+def scrapeOffline():
+    with open("cache/cache.json", "r") as cache:
+        cached_table = loads(cache.read())
+
+    table(zip(cached_table['positions'], cached_table['names'], cached_table['mp'], cached_table['pts'], cached_table['gd']), False)
+
+
+def table(final_table, online=True):
     newLine = '\n'
     windowText = dict()
 
@@ -114,7 +144,6 @@ def table(final_table):
     gd = Label(tableRoot, text=windowText['gd'], justify='left', font=('Century Gothic',10))
     gd.place(x=360, y=50)
 
-
     def darkMode():
         tableRoot.configure(bg='#121212')
         header.configure(fg='#FFFFFF', bg='#121212')
@@ -132,13 +161,13 @@ def table(final_table):
     tableRoot.mainloop()
 
 
-def networkError():
+def failure():
     sleep(1)
     destroyWatermark()
 
     errorRoot = Tk()
     errorRoot.overrideredirect(True)
-    errorRoot.geometry('400x130')
+    errorRoot.geometry('370x130')
 
     screenWidth = errorRoot.winfo_screenwidth()
     screenHeight = errorRoot.winfo_screenheight()
@@ -146,12 +175,12 @@ def networkError():
     yPosition = (screenHeight - 200)//2
     errorRoot.geometry(f'+{xPosition}+{yPosition}')
 
-    errorString = "Failed To Establish Connection. Check Your Network."
+    errorString = "Connect to network to load table."
     errorMessage = Label(errorRoot, text=errorString, justify='center', font=('Century Gothic',11))
-    errorMessage.place(x=8, y=30)
+    errorMessage.place(x=55, y=30)
 
     exit_button = Button(errorRoot, text="EXIT", command=errorRoot.destroy, font=('Century Gothic',9))
-    exit_button.place(x=185, y = 90)
+    exit_button.place(relx=0.45, y = 80)
     # img = PhotoImage(file="img/exit_black.png")
     # exitButton = Button(errorRoot, image=img, borderwidth=0, command=errorRoot.destroy)
     # exitButton.place(x=173, y=70)
