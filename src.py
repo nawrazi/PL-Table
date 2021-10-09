@@ -94,13 +94,11 @@ def scrapeOnline():
             pass
 
         data = dumps(final_table)
-        try:
-            with open('cache/cache.json','r+') as cache:
-                cache.write(data)
-        except FileNotFoundError as noCacheToRead:
-            with open('cache/cache.json','w+') as cache:
-                cache.write(data)
-                system('attrib +h cache/cache.json')
+        with open('cache/cache.json','a+') as cache:
+            cache.truncate(0)
+            cache.write(data)
+
+        system('attrib +h cache/cache.json')
 
     saveCache()
     table(zip(*final_table.values()))
