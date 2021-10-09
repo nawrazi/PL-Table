@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Canvas, NW, messagebox, Button, PhotoImage
+from tkinter import Tk, Label, Canvas, NW, Button, PhotoImage
 from bs4 import BeautifulSoup
 from requests import get, exceptions
 from PIL import ImageTk, Image
@@ -7,7 +7,7 @@ from sys import exit
 from time import sleep
 from darkdetect import isDark
 from json import dumps, loads
-from os import mkdir
+from os import mkdir, system
 
 
 def watermark():
@@ -17,23 +17,23 @@ def watermark():
     screenWidth = waterRoot.winfo_screenwidth()
     screenHeight = waterRoot.winfo_screenheight()
 
-    pillowImage = Image.open("img/watermark.png")
+    pillowImage = Image.open('img/watermark.png')
     imageWidth, imageHeight = pillowImage.size
 
     xPosition = (screenWidth // 2) - (imageWidth // 2)
     yPosition = (screenHeight // 2) - (imageHeight // 2) - int(0.05787*screenHeight)
 
-    canvas = Canvas(waterRoot, width = 487, height = 487, bg = "white", highlightthickness = 0)
+    canvas = Canvas(waterRoot, width=487, height=487, bg='white', highlightthickness=0)
     canvas.pack()
     canvas.master.overrideredirect(True)
-    canvas.master.geometry(f'+{xPosition}+{yPosition}')
-    canvas.master.wm_attributes("-transparentcolor", "white")
-    canvas.master.wm_attributes("-alpha", 0.6)
-    canvas.master.wm_attributes("-topmost", True)
+    canvas.master.geometry(f"+{xPosition}+{yPosition}")
+    canvas.master.wm_attributes('-transparentcolor', 'white')
+    canvas.master.wm_attributes('-alpha', 0.6)
+    canvas.master.wm_attributes('-topmost', True)
     canvas.master.lift()
 
     photoImage = ImageTk.PhotoImage(pillowImage)
-    canvas.create_image(10, 10, anchor = NW, image = photoImage)
+    canvas.create_image(10, 10, anchor=NW, image=photoImage)
 
     waterRoot.mainloop()
 
@@ -50,7 +50,7 @@ def scrape():
 
 
 def scrapeOnline():
-    URL = 'https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5'
+    URL = "https://www.goal.com/en/premier-league/table/2kwbbcootiqqgmrzs6o5inle5"
 
     webpage = get(URL, timeout=6).text
 
@@ -79,37 +79,36 @@ def scrapeOnline():
         goal_diff = (team.find('td', class_='p0c-competition-tables__goals-diff')).text.strip()
         gd_list.append(goal_diff)
 
+    final_table = {
+        'pos': pos_list,
+        'names': name_list,
+        'mp': mp_list,
+        'pts': points_list,
+        'gd': gd_list
+    }
+
     def saveCache():
-        final_table = {
-            'positions': pos_list,
-            'names': name_list,
-            'mp': mp_list,
-            'pts': points_list,
-            'gd': gd_list
-        }
-
-        data = dumps(final_table)
-
         try:
             mkdir('cache')
         except FileExistsError:
             pass
 
-        with open("cache/cache.json","w") as f:
-            f.write(data)
+        data = dumps(final_table)
+        with open('cache/cache.json','w') as cache:
+            cache.write(data)
 
     saveCache()
-    table(zip(pos_list, name_list, mp_list, points_list, gd_list))
+    table(zip(*final_table.values()))
 
 
 def scrapeOffline():
-    with open("cache/cache.json", "r") as cache:
+    with open('cache/cache.json', 'r') as cache:
         cached_table = loads(cache.read())
 
-    table(zip(cached_table['positions'], cached_table['names'], cached_table['mp'], cached_table['pts'], cached_table['gd']), False)
+    table(zip(*cached_table.values()), False)
 
 
-def table(final_table, online=True):
+def table(table, online=True):
     newLine = '\n'
     windowText = dict()
 
@@ -117,7 +116,7 @@ def table(final_table, online=True):
 
     windowText['pos'], windowText['names'], windowText['mp'], windowText['pts'], windowText['gd'] = (str() for _ in range(5))
 
-    for pos, name, mp, pts, gd in final_table:
+    for pos, name, mp, pts, gd in table:
         windowText['pos'] += f"{' '*(3 - len(pos))}{pos}.{newLine*2}"
         windowText['names'] += f"{name}{newLine*2}"
         windowText['mp'] += f"{mp}{newLine*2}"
@@ -133,7 +132,7 @@ def table(final_table, online=True):
     tableRoot.attributes('-topmost',True)
     xPosition = (screenWidth-430)//4
     yPosition = (screenHeight-740)//4
-    tableRoot.geometry(f'+{xPosition}+{yPosition}')
+    tableRoot.geometry(f"+{xPosition}+{yPosition}")
 
     header = Label(tableRoot, text=windowText['header'], justify='left', font=('Century Gothic Bold',11))
     header.place(x=5, y=15)
@@ -176,9 +175,6 @@ def table(final_table, online=True):
 
 
 def failure():
-    sleep(1)
-    destroyWatermark()
-
     errorRoot = Tk()
     errorRoot.overrideredirect(True)
     errorRoot.geometry('370x130')
@@ -192,20 +188,18 @@ def failure():
     errorString = "Connect to network to load table."
     errorMessage = Label(errorRoot, text=errorString, justify='center', font=('Century Gothic',11))
     errorMessage.place(x=55, y=30)
+    exit_button = Button(errorRoot, text='EXIT', command=errorRoot.destroy, font=('Century Gothic',11))
+    exit_button.place(relx=0.45, y=80)
 
-    exit_button = Button(errorRoot, text="EXIT", command=errorRoot.destroy, font=('Century Gothic',9))
-    exit_button.place(relx=0.45, y = 80)
-    # img = PhotoImage(file="img/exit_black.png")
-    # exitButton = Button(errorRoot, image=img, borderwidth=0, command=errorRoot.destroy)
-    # exitButton.place(x=173, y=70)
-
-    if isDark():
+    def darkMode():
         errorRoot.configure(bg='#121212')
         errorMessage.configure(fg='#ffffff', bg='#121212')
-
         exit_button.configure(fg='#ffffff', bg='#121212')
-        # imgW = PhotoImage(file="img/exit_white.png")
-        # exitButton.configure(image=imgW, bg='#121212')
+
+    if isDark():
+        darkMode()
+
+    destroyWatermark()
 
     errorRoot.mainloop()
 
@@ -218,7 +212,7 @@ def destroyWatermark():
 
 
 if __name__ == '__main__':
-    waterMark = Thread(target = watermark)
-    scrape = Thread(target = scrape)
+    waterMark = Thread(target=watermark)
+    scrape = Thread(target=scrape)
     waterMark.start()
     scrape.start()
