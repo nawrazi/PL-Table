@@ -42,6 +42,7 @@ def scrape():
     try:
         scrapeOnline()
     except exceptions.RequestException as noConnection:
+        sleep(1)
         try:
             scrapeOffline()
         except FileNotFoundError as noCache:
