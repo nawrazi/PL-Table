@@ -54,7 +54,7 @@ def scrapeOnline():
 
     webpage = get(URL, timeout=6).text
 
-    soup = BeautifulSoup(webpage, 'lxml')
+    soup = BeautifulSoup(webpage, 'html.parser')
 
     pos_list, name_list, mp_list, points_list, gd_list = (list() for _ in range(5))
 
